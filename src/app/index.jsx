@@ -1,5 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+window.$ = window.jQuery = require('jquery');
+// mocks
+var mockjax = require('jquery-mockjax')
+import mock from 'mock';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 import MuiThemeProvider from '../../node_modules/material-ui/styles/MuiThemeProvider';
@@ -28,20 +32,24 @@ export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {value: 1};
+        this.handleChange = this.handleChange.bind(this);
     };
-    
-//    handleChange(event, index, value) {
-//        this.state = ({value});
-//    }
-    
+
     handleChange(event, index, value) {
         this.setState({value});
     }
     
+    componentDidMount() {
+        console.log('Component DID MOUNT!')
+        this.serverRequest = $.get('/trackies.js', function(response) {
+            console.log(response);
+        });
+    }
+    
 //    handleChange = (event, index, value) => this.setState({value});
     
-    
     render() {
+        var trackies = this.props.trackies;
         return(
             <MuiThemeProvider>
                 <div>
@@ -59,9 +67,9 @@ export default class App extends React.Component {
                     <div>
                         <DropDownMenu value={this.state.value}
                                 onChange={this.handleChange}>
-                            <MenuItem value="{1}" primaryText="work"/>
-                            <MenuItem value="{2}" primaryText="tree-project"/>
-                            <MenuItem value="{3}" primaryText="tracking-alternative"/>
+                            <MenuItem value={1} primaryText="work"/>
+                            <MenuItem value={2} primaryText="tree-project"/>
+                            <MenuItem value={3} primaryText="tracking-alternative"/>
                         </DropDownMenu>
                         <FloatingActionButton secondary={true}>
                             <ContentAdd />
@@ -69,6 +77,7 @@ export default class App extends React.Component {
                     </div>
                     <List>
                         <Subheader>Tracked items</Subheader>
+
                         <ListItem primaryText="todo item" leftIcon={<ActionGrade color={pinkA200} />} />
                     </List>
                 </div>
@@ -78,6 +87,6 @@ export default class App extends React.Component {
 }
 
 ReactDOM.render(
-  <App />,
+  <App trackies={[]}/>,
   document.getElementById('content')
 );

@@ -36,7 +36,7 @@ module.exports = {
     },
     plugins: [
         new CopyWebpackPlugin([
-            {from: 'src/asdsdaf.html', to: 'dist'}
+            {from: 'src/*.html', to: 'dist'} // not working!
         ], {
             copyUnmodified: true
         })
