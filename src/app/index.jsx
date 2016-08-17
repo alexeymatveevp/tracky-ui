@@ -1,9 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 window.$ = window.jQuery = require('jquery');
-// mocks
-var mockjax = require('jquery-mockjax')
-import mock from 'mock';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 import MuiThemeProvider from '../../node_modules/material-ui/styles/MuiThemeProvider';
@@ -27,6 +24,8 @@ import DropDownMenu from '../../node_modules/material-ui/DropDownMenu';
 import MenuItem from '../../node_modules/material-ui/MenuItem';
 import Paper from '../../node_modules/material-ui/Paper';
 
+import 'mock'; // mocking
+
 export default class App extends React.Component {
     
     constructor(props) {
@@ -41,7 +40,7 @@ export default class App extends React.Component {
     
     componentDidMount() {
         console.log('Component DID MOUNT!')
-        this.serverRequest = $.get('/trackies.js', function(response) {
+        this.serverRequest = $.get('/trackies', function(response) {
             console.log(response);
         });
     }

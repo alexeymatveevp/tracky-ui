@@ -1,5 +1,17 @@
-class Mock {
-    // https://www.npmjs.com/package/jquery-mockjax
-}
+//import $ from 'jquery';
+//import _ from 'lodash';
+//import mockjax from 'jquery-mockjax';
+//require('script!../../../node_modules/jquery-mockjax/dist/jquery.mockjax.min.js');
 
-exports.default=Mock
+var $ = require('jquery');
+var mj = require('jquery-mockjax');
+var mockjax = mj($, window);
+// https://www.npmjs.com/package/jquery-mockjax
+
+mockjax({
+    url: "/trackies",
+    responseText: {
+        status: "success",
+        fortune: "Are you a mock turtle?"
+    }
+});
