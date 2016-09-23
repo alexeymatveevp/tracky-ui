@@ -1,0 +1,13 @@
+.tracky-box {
+    margin: 20px auto;
+    width: 80%;
+    > .text-field {
+        margin: auto 20px;
+    }
+    > .select {
+        // margin: 10px;
+    }
+    > .btn {
+        margin: 10px;
+    }
+}

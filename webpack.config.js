@@ -29,6 +29,10 @@ module.exports = {
                 loader: 'babel'
             },
 //            {
+//                text: /\.scss$/,
+//                loaders: ['style', 'css', 'sass']
+//            }
+//            {
 //                test: /jquery-mockjax/,
 //                loader: 'imports?jQuery=jquery,$=jquery,this=>window'
 //            },
@@ -73,7 +77,8 @@ module.exports = {
     resolve: {
         modulesDirectories: [
             "node_modules",
-            "mock"
+            "mock",
+            "scss"
         ]
     }
 }
