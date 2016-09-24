@@ -8,6 +8,7 @@
 </head>
 <body ng-controller="ctrl">
   <h1>Food tracking</h1>
+  <span class="glyphicon glyphicon-cutlery"></span>
   <label>Choose other endpoint (than this host)</label>
   <input type="checkbox" ng-model="otherEndpoint">
   <select ng-show="otherEndpoint" ng-options="e for e in endpoints" ng-model="endpoint" ng-change="refreshFoodies()"></select>
