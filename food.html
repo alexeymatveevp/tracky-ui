@@ -8,8 +8,9 @@
 </head>
 <body ng-controller="ctrl">
   <h1>Food tracking</h1>
-  <label>endpoint</label>
-  <select ng-options="e for e in endpoints" ng-model="endpoint" ng-change="refreshFoodies()"></select>
+  <label>Choose other endpoint (than this host)</label>
+  <input type="checkbox" ng-model="otherEndpoint">
+  <select ng-show="otherEndpoint" ng-options="e for e in endpoints" ng-model="endpoint" ng-change="refreshFoodies()"></select>
   <h2>create new food</h2>
   <label>Describe the food</label>
   <input ng-model="foodname">
