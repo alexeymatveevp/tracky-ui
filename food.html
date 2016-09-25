@@ -20,6 +20,13 @@
   <input type="date" ng-model="fooddate">
   <button ng-click="putFoody()">Create</button>
   <h2>List of food</h2>
+  <div>
+    <select ng-options="pn for pn in personNames" ng-model="piePerson" ng-change="refreshChart()"></select>
+    <select ng-options="d.desc for d in chartDatePeriods track by d.id" ng-model="pieDate" ng-change="refreshChart()"></select>
+    <nvd3 options="pieOptions" data="pieData"></nvd3>
+    <nvd3 options="barChartOptions" data="barData"></nvd3>
+    </div>
+  </div>
   <table class="table">
     <thead>
       <th>ID</th>
@@ -27,6 +34,7 @@
       <th>date</th>
       <th>name</th>
       <th>weight</th>
+      <th></th>
     </thead>
     <tbody>
       <tr ng-repeat="f in foodies">
@@ -35,11 +43,22 @@
         <td>{{f.date}}</td>
         <td>{{f.name}}</td>
         <td>{{f.weight}}</td>
+        <td><span class="glyphicon glyphicon-trash" style="cursor: pointer" ng-click="deleteFoody(f)"></span></td>
       </tr>
     </tbody>
   </table>
+
 </body>
 <script src="angular.min.js"></script>
+<script src="lib/d3.js"></script>
+<script src="lib/nv.d3.min.js"></script>
+<script src="lib/angular-nvd3.min.js"></script>
 <script src="food.js"></script>
 <link rel="stylesheet" href="bootstrap.css"/>
+<link rel="stylesheet" href="lib/nv.d3.min.css"/>
+<style>
+nvd3 > svg {
+  display: inline-block!important;
+}
+</style>
 </html>

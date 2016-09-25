@@ -1,7 +1,8 @@
-var app = angular.module('app', []);
+var app = angular.module('app', ['nvd3']);
 app.controller('ctrl', function($scope, $http) {
     $scope.personNames = ['alex', 'kristino4ka'];
     $scope.endpoints = ['http://localhost:8080', 'http://91.240.84.2:8080', 'http://192.168.10.22:8080', 'http://192.168.10.21:8080'];
+    $scope.endpoint = 'http://localhost:8080';
 
     $scope.putFoody = function() {
       var request = {
@@ -40,4 +41,118 @@ app.controller('ctrl', function($scope, $http) {
     }
 
     $scope.refreshFoodies();
+
+    $scope.deleteFoody = function(foody) {
+      var prefix = $scope.endpoint ? $scope.endpoint : '';
+      $http.delete(prefix + '/foody?id=' + foody.id).then(function(res) {
+        var idx = $scope.foodies.indexOf(foody);
+        $scope.foodies.splice(idx, 1);
+      });
+    }
+
+    $scope.piePerson = 'kristino4ka';
+    $scope.chartDatePeriods = [
+      {id: 'day', desc: 'This day'},
+      {id: 'week', desc: 'This week'},
+      {id: 'month', desc: 'This month'},
+      {id: 'year', desc: 'Whole year'}
+    ]
+    $scope.pieOptions = {
+      chart: {
+        type: 'pieChart',
+        height: 500,
+        width: 500,
+        x: function(d){return d.x;},
+        y: function(d){return d.y;},
+        showLabels: true,
+        duration: 500,
+        labelThreshold: 0.01,
+        labelSunbeamLayout: true,
+        legend: {
+          margin: {
+            top: 5,
+            right: 5,
+            bottom: 5,
+            left: 0
+          }
+        }
+      },
+      title: {
+        enable: true,
+        text: 'Calories distribution'
+      }
+    };
+
+    $scope.barChartOptions = {
+            chart: {
+                type: 'historicalBarChart',
+                height: 450,
+                width: 500,
+                margin : {
+                    top: 20,
+                    right: 20,
+                    bottom: 65,
+                    left: 65
+                },
+                x: function(d){return d[0];},
+                y: function(d){return d[1];},
+                // clipEdge: true,
+                duration: 500,
+                xAxis: {
+                    axisLabel: 'Date',
+                    showMaxMin: false,
+                    // rotateLabels: 30,
+                    tickFormat: function(d){
+                        // return d3.format(',f')(d);
+                        // return new Date(d);
+                        return d3.time.format("%d-%m")(new Date(d));
+                    },
+                },
+                yAxis: {
+                    axisLabel: 'Calories',
+                    axisLabelDistance: -20,
+                    tickFormat: function(d){
+                        return d3.format(',.1f')(d);
+                    },
+                },
+                tooltip: {
+                  // headerEnabled: true,
+                  // headerFormatter: function(d,q,e) {
+                  //   return 'asdf';
+                  // },
+                  valueFormatter: function (d, i) {
+                    return d3.format(',.1f')(d) + ' calories';
+                  },
+                  keyFormatter: function(d) {
+                    return d3.time.format("%d-%m")(new Date(d));
+                  }
+                },
+                zoom: {
+                    enabled: true,
+                    scaleExtent: [1, 10],
+                    useFixedDomain: false,
+                    useNiceScale: false,
+                    horizontalOff: false,
+                    verticalOff: true,
+                    unzoomEventType: 'dblclick.zoom'
+                }
+            }
+        };
+
+    $scope.refreshChart = function() {
+      var prefix = $scope.endpoint ? $scope.endpoint : '';
+      var dateParam = $scope.pieDate ? '&type=' + $scope.pieDate.id : '';
+      $http.get(prefix + '/caloriesChart?personName=' + $scope.piePerson + dateParam).then(function(res) {
+        $scope.pieData = res.data;
+      });
+      $http.get(prefix + '/barChart?personName=' + $scope.piePerson).then(function(res) {
+        $scope.barData = [{
+          key: "Calories distribution",
+          bar: true,
+          values: res.data
+        }];
+      });
+    }
+
+    $scope.refreshChart();
 });
