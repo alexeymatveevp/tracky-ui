@@ -2,7 +2,7 @@ var app = angular.module('app', ['nvd3']);
 app.controller('ctrl', function($scope, $http) {
     $scope.personNames = ['alex', 'kristino4ka'];
     $scope.endpoints = ['http://localhost:8080', 'http://91.240.84.2:8080', 'http://192.168.10.22:8080', 'http://192.168.10.21:8080'];
-    $scope.endpoint = 'http://localhost:8080';
+    // $scope.endpoint = 'http://localhost:8080';
 
     $scope.putFoody = function() {
       var request = {
