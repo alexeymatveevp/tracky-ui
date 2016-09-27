@@ -7,18 +7,54 @@
   <title>Food tracking</title>
 </head>
 <body ng-controller="ctrl">
-  <h1>Food tracking</h1>
-  <span class="glyphicon glyphicon-cutlery"></span>
-  <label>Choose other endpoint (than this host)</label>
-  <input type="checkbox" ng-model="otherEndpoint">
-  <select ng-show="otherEndpoint" ng-options="e for e in endpoints" ng-model="endpoint" ng-change="refreshFoodies()"></select>
-  <h2>create new food</h2>
-  <label>Describe the food</label>
-  <input ng-model="foodname">
-  <select ng-options="pn for pn in personNames" ng-model="foodperson"></select>
-  <input type="number" ng-model="foodweight">
-  <input type="date" ng-model="fooddate">
-  <button ng-click="putFoody()">Create</button>
+<md-content>
+  <md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+      <h2>
+        <span>Foody - трекер питания <span class="glyphicon glyphicon-cutlery"></span></span>
+      </h2>
+    </div>
+  </md-toolbar>
+  <h1></h1>
+  <div layout="column" layout-padding>
+    <md-radio-group ng-model="foodperson">
+      <md-radio-button value="alex" class="md-primary">alex</md-radio-button>
+      <md-radio-button value="kristino4ka">kristino4ka</md-radio-button>
+    </md-radio-group>
+  </div>
+  <div layout="row" layout-padding>
+    <md-autocomplete
+        md-selected-item="selectedFood"
+        md-search-text="searchFood"
+        md-items="item in searchProducts(searchFood)"
+        md-item-text="item.p.name"
+        md-min-length="3"
+        placeholder="Что мы сегодня кушали?"
+        >
+      <md-item-template>
+        <span md-highlight-text="searchFood" md-highlight-flags="^i">{{item.p.name}} {{item.p.runame}}</span>
+      </md-item-template>
+      <md-not-found>
+        No states matching "{{searchText}}" were found.
+        <a ng-click="newProduct(searchText)">Create a new one!</a>
+      </md-not-found>
+    </md-autocomplete>
+    <md-autocomplete ng-model="foodweight"
+        md-selected-item="selectedWeight"
+        md-search-text="searchWeight"
+        md-items="item in weightHints"
+        md-item-text="item"
+        md-min-length="1"
+        placeholder="Сколько граммов?">
+      <md-item-template>
+        <span md-highlight-text="searchWeight" md-highlight-flags="^i">{{item}} г.</span>
+      </md-item-template>
+    </md-autocomplete>
+  </div>
+  <div layout="row" layout-padding>
+    <md-datepicker ng-model="fooddate" md-placeholder=""></md-datepicker>
+    <md-button class="md-raised md-warn" ng-click="putFoody()">Затрекать</md-button>
+  </div>
   <h2>List of food</h2>
   <div>
     <select ng-options="pn for pn in personNames" ng-model="piePerson" ng-change="refreshChart()"></select>
@@ -47,15 +83,23 @@
       </tr>
     </tbody>
   </table>
-
+  <label>Choose other endpoint (than this host)</label>
+  <input type="checkbox" ng-model="otherEndpoint">
+  <select ng-show="otherEndpoint" ng-options="e for e in endpoints" ng-model="endpoint" ng-change="refreshFoodies()"></select>
+</md-content>
 </body>
-<script src="angular.min.js"></script>
+
+<script src="lib/angular.min.js"></script>
 <script src="lib/d3.js"></script>
 <script src="lib/nv.d3.min.js"></script>
 <script src="lib/angular-nvd3.min.js"></script>
+<script src="lib/angular-animate.min.js"></script>
+<script src="lib/angular-aria.min.js"></script>
+<script src="lib/angular-material.min.js"></script>
 <script src="food.js"></script>
 <link rel="stylesheet" href="bootstrap.css"/>
 <link rel="stylesheet" href="lib/nv.d3.min.css"/>
+<link rel="stylesheet" href="lib/angular-material.min.css"/>
 <style>
 nvd3 > svg {
   display: inline-block!important;

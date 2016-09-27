@@ -1,19 +1,21 @@
-var app = angular.module('app', ['nvd3']);
+var app = angular.module('app', ['nvd3', 'ngMaterial']);
 app.controller('ctrl', function($scope, $http) {
     $scope.personNames = ['alex', 'kristino4ka'];
     $scope.endpoints = ['http://localhost:8080', 'http://91.240.84.2:8080', 'http://192.168.10.22:8080', 'http://192.168.10.21:8080'];
     // $scope.endpoint = 'http://localhost:8080';
+    $scope.weightHints = [10, 15, 30, 50, 100, 150, 200, 250, 300, 350];
 
     $scope.putFoody = function() {
+      var food = $scope.selectedFood ? $scope.selectedFood.value2 : $scope.searchFood; // in russian :) cooked sausage doctor
       var request = {
-        "name": $scope.foodname,
+        "name": food,
         "person": $scope.foodperson
       };
       if ($scope.fooddate) {
         request.date = $scope.fooddate;
       };
-      if ($scope.foodweight) {
-        request.weight = $scope.foodweight;
+      if ($scope.selectedWeight || $scope.searchWeight) {
+        request.weight = $scope.selectedWeight ? $scope.selectedWeight : $scope.searchWeight;
       }
       // var params = '?name=' + $scope.foodname + '&person=' + $scope.foodperson;
       // if ($scope.fooddate) {
@@ -155,4 +157,46 @@ app.controller('ctrl', function($scope, $http) {
     }
 
     $scope.refreshChart();
+
+    var prefix = $scope.endpoint ? $scope.endpoint : '';
+    $http.get(prefix + '/allProducts').then(function(res) {
+      var products = [];
+      for (var i in res.data) {
+        var p = res.data[i];
+        products.push({
+          value1: p.name.toLowerCase(),
+          value2: p.runame.toLowerCase(),
+          p: p
+        });
+      }
+      $scope.products = products;
+    })
+    $scope.searchProducts = function(query) {
+      var results = query ? $scope.products.filter(createFilterFor(query)) : $scope.products;
+      return results;
+    }
+    function createFilterFor(query) {
+      var lowercaseQuery = angular.lowercase(query);
+      return function filterFn(state) {
+        return (state.value1.indexOf(lowercaseQuery) !== -1 || state.value2.indexOf(lowercaseQuery) !== -1);
+      };
+    }
+    $scope.newProduct = function(text) {
+
+    }
+
+    $scope.createNewProduct = function() {
+      var request = {
+        "name": "Olivie",
+        "runame": "Оливье",
+        "calories": 198,
+        "protein": 7,
+        "fat": 16,
+        "сarbs": 8,
+      }
+      var prefix = $scope.endpoint ? $scope.endpoint : '';
+      $http.post(prefix + '/product', request).then(function(res) {
+        console.log(res);
+      })
+    }
 });
