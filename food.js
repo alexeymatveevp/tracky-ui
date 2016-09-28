@@ -186,17 +186,46 @@ app.controller('ctrl', function($scope, $http) {
     }
 
     $scope.createNewProduct = function() {
-      var request = {
-        "name": "Olivie",
-        "runame": "Оливье",
-        "calories": 198,
-        "protein": 7,
-        "fat": 16,
-        "сarbs": 8,
+      var newProduct = {
+        "name": $scope.npName,
+        "runame": $scope.npRuname,
+        "calories": $scope.npCalories,
+        "protein": $scope.npProtein,
+        "fat": $scope.npFat,
+        "carbs": $scope.npCarbs,
       }
-      var prefix = $scope.endpoint ? $scope.endpoint : '';
-      $http.post(prefix + '/product', request).then(function(res) {
-        console.log(res);
-      })
+      $scope.saveProduct(newProduct, function(res) {
+        var savedProductId = res.data.data;
+        newProduct.id = savedProductId;
+        $scope.products.push({
+          value1: newProduct.name.toLowerCase(),
+          value2: newProduct.runame.toLowerCase(),
+          p: newProduct
+        });
+      });
     }
+
+    $scope.saveProduct = function(p, successFn) {
+      var prefix = $scope.endpoint ? $scope.endpoint : '';
+      $http.post(prefix + '/product', p).then(successFn);
+    }
+
+    $scope.deleteProduct = function(p) {
+      var prefix = $scope.endpoint ? $scope.endpoint : '';
+      $http.delete(prefix + '/product?id=' + p.id).then(function(res) {
+        var success = res.data.success;
+        if (success) {
+          var idx = $scope.products.indexOf(p);
+          $scope.products.splice(idx, 1);
+        } else {
+          alert('delete failed');
+        }
+      });
+    }
+
+    $scope.deleteProductCache = function() {
+      var prefix = $scope.endpoint ? $scope.endpoint : '';
+      $http.post(prefix + '/dropProductCache');
+    }
+
 });
