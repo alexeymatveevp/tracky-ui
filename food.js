@@ -9,25 +9,12 @@ app.controller('ctrl', function($scope, $http) {
       var food = $scope.selectedFood ? $scope.selectedFood.value2 : $scope.searchFood; // in russian :) cooked sausage doctor
       var request = {
         "name": food,
-        "person": $scope.foodperson
+        "person": $scope.foodperson,
+        "weight": $scope.foodweight
       };
       if ($scope.fooddate) {
         request.date = $scope.fooddate;
       };
-      if ($scope.selectedWeight || $scope.searchWeight) {
-        request.weight = $scope.selectedWeight ? $scope.selectedWeight : $scope.searchWeight;
-      }
-      // var params = '?name=' + $scope.foodname + '&person=' + $scope.foodperson;
-      // if ($scope.fooddate) {
-      //   params = params + '&date=' + $scope.fooddate;
-      // }
-      // if ($scope.foodweight) {
-      //   params = params + '&weight=' + $scope.foodweight;
-      // }
-      // $http.get($scope.endpoint + '/foody' + params).then(function(res) {
-      //   console.log(res);
-      //   $scope.refreshFoodies();
-      // });
       var prefix = $scope.endpoint ? $scope.endpoint : '';
       $http.put(prefix + '/foody', request).then(function(res) {
         console.log(res);
@@ -54,10 +41,14 @@ app.controller('ctrl', function($scope, $http) {
 
     $scope.piePerson = 'kristino4ka';
     $scope.chartDatePeriods = [
-      {id: 'day', desc: 'This day'},
+      {id: 'today', desc: 'Today'},
+      {id: 'yesterday', desc: 'Yesterday'},
       {id: 'week', desc: 'This week'},
+      {id: 'lastweek', desc: 'Last week'},
       {id: 'month', desc: 'This month'},
-      {id: 'year', desc: 'Whole year'}
+      {id: 'lastmonth', desc: 'Last month'},
+      {id: 'year', desc: 'This year'},
+      {id: 'lastyear', desc: 'Last year'}
     ]
     $scope.pieOptions = {
       chart: {
@@ -86,65 +77,79 @@ app.controller('ctrl', function($scope, $http) {
     };
 
     $scope.barChartOptions = {
-            chart: {
-                type: 'historicalBarChart',
-                height: 450,
-                width: 500,
-                margin : {
-                    top: 20,
-                    right: 20,
-                    bottom: 65,
-                    left: 65
-                },
-                x: function(d){return d[0];},
-                y: function(d){return d[1];},
-                // clipEdge: true,
-                duration: 500,
-                xAxis: {
-                    axisLabel: 'Date',
-                    showMaxMin: false,
-                    // rotateLabels: 30,
-                    tickFormat: function(d){
-                        // return d3.format(',f')(d);
-                        // return new Date(d);
-                        return d3.time.format("%d-%m")(new Date(d));
-                    },
-                },
-                yAxis: {
-                    axisLabel: 'Calories',
-                    axisLabelDistance: -20,
-                    tickFormat: function(d){
-                        return d3.format(',.1f')(d);
-                    },
-                },
-                tooltip: {
-                  // headerEnabled: true,
-                  // headerFormatter: function(d,q,e) {
-                  //   return 'asdf';
-                  // },
-                  valueFormatter: function (d, i) {
-                    return d3.format(',.1f')(d) + ' calories';
-                  },
-                  keyFormatter: function(d) {
+        chart: {
+            type: 'historicalBarChart',
+            height: 450,
+            width: 500,
+            margin : {
+                top: 20,
+                right: 20,
+                bottom: 65,
+                left: 65
+            },
+            x: function(d){return d[0];},
+            y: function(d){return d[1];},
+            // clipEdge: true,
+            duration: 500,
+            xAxis: {
+                axisLabel: 'Date',
+                showMaxMin: false,
+                // rotateLabels: 30,
+                tickFormat: function(d){
+                    // return d3.format(',f')(d);
+                    // return new Date(d);
                     return d3.time.format("%d-%m")(new Date(d));
-                  }
                 },
-                zoom: {
-                    enabled: true,
-                    scaleExtent: [1, 10],
-                    useFixedDomain: false,
-                    useNiceScale: false,
-                    horizontalOff: false,
-                    verticalOff: true,
-                    unzoomEventType: 'dblclick.zoom'
+            },
+            yAxis: {
+                axisLabel: 'Calories',
+                axisLabelDistance: -20,
+                tickFormat: function(d){
+                    return d3.format(',.1f')(d);
+                },
+            },
+            tooltip: {
+              // headerEnabled: true,
+              // headerFormatter: function(d,q,e) {
+              //   return 'asdf';
+              // },
+              valueFormatter: function (d, i) {
+                return d3.format(',.1f')(d) + ' calories';
+              },
+              keyFormatter: function(d) {
+                return d3.time.format("%d-%m")(new Date(d));
+              }
+            },
+            bars: {
+              dispatch: {
+                elementClick: function(t,u) {
+                  $scope.refreshChart(t.data[0]);
                 }
+              }
             }
-        };
+            // zoom: {
+            //     enabled: true,
+            //     scaleExtent: [1, 10],
+            //     useFixedDomain: false,
+            //     useNiceScale: false,
+            //     horizontalOff: false,
+            //     verticalOff: true,
+            //     unzoomEventType: 'dblclick.zoom'
+            // }
+        }
+    };
 
-    $scope.refreshChart = function() {
+    $scope.refreshChart = function(timestamp) {
       var prefix = $scope.endpoint ? $scope.endpoint : '';
-      var dateParam = $scope.pieDate ? '&type=' + $scope.pieDate.id : '';
-      $http.get(prefix + '/caloriesChart?personName=' + $scope.piePerson + dateParam).then(function(res) {
+      var dateParam = $scope.pieDate ? '&specificPeriod=' + $scope.pieDate.id : '';
+      var timestampParam = timestamp ? '&timestamp=' + timestamp : '';
+      if (timestamp) {
+        $scope.pieChartForDate = new Date(timestamp);
+      } else if ($scope.pieDate) {
+        $scope.pieChartForDate = $scope.pieDate.desc;
+      }
+
+      $http.get(prefix + '/caloriesChart?personName=' + $scope.piePerson + dateParam + timestampParam).then(function(res) {
         $scope.pieData = res.data;
       });
       $http.get(prefix + '/barChart?personName=' + $scope.piePerson).then(function(res) {

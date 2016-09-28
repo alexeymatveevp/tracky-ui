@@ -15,121 +15,120 @@
       </h2>
     </div>
   </md-toolbar>
-  <h1></h1>
-  <div layout="column" layout-padding>
-    <md-radio-group ng-model="foodperson">
-      <md-radio-button value="alex" class="md-primary">alex</md-radio-button>
-      <md-radio-button value="kristino4ka">kristino4ka</md-radio-button>
-    </md-radio-group>
-  </div>
-  <div layout="row" layout-padding>
-    <md-autocomplete
-        md-selected-item="selectedFood"
-        md-search-text="searchFood"
-        md-items="item in searchProducts(searchFood)"
-        md-item-text="item.p.runame"
-        md-min-length="3"
-        placeholder="Что мы сегодня кушали?"
-        >
-      <md-item-template>
-        <span md-highlight-text="searchFood" md-highlight-flags="^i">{{item.p.name}} {{item.p.runame}}</span>
-      </md-item-template>
-      <md-not-found>
-        No states matching "{{searchText}}" were found.
-        <a ng-click="newProduct(searchText)">Create a new one!</a>
-      </md-not-found>
-    </md-autocomplete>
-    <md-autocomplete ng-model="foodweight"
-        md-selected-item="selectedWeight"
-        md-search-text="searchWeight"
-        md-items="item in weightHints"
-        md-item-text="item"
-        md-min-length="1"
-        placeholder="Сколько граммов?">
-      <md-item-template>
-        <span md-highlight-text="searchWeight" md-highlight-flags="^i">{{item}} г.</span>
-      </md-item-template>
-    </md-autocomplete>
-  </div>
-  <div layout="row" layout-padding>
-    <md-datepicker ng-model="fooddate" md-placeholder=""></md-datepicker>
-    <md-button class="md-raised md-warn" ng-click="putFoody()">Затрекать</md-button>
-  </div>
-  <h2>List of food</h2>
-  <div>
-    <select ng-options="pn for pn in personNames" ng-model="piePerson" ng-change="refreshChart()"></select>
-    <select ng-options="d.desc for d in chartDatePeriods track by d.id" ng-model="pieDate" ng-change="refreshChart()"></select>
-    <nvd3 options="pieOptions" data="pieData"></nvd3>
-    <nvd3 options="barChartOptions" data="barData"></nvd3>
-    </div>
-  </div>
-  <table class="table">
-    <thead>
-      <th>ID</th>
-      <th>person</th>
-      <th>date</th>
-      <th>name</th>
-      <th>weight</th>
-      <th></th>
-    </thead>
-    <tbody>
-      <tr ng-repeat="f in foodies | orderBy: 'date' : true">
-        <td>{{f.id}}</td>
-        <td>{{f.person}}</td>
-        <td>{{f.date | date}}</td>
-        <td>{{f.name}}</td>
-        <td>{{f.weight}}</td>
-        <td><span class="glyphicon glyphicon-trash" style="cursor: pointer" ng-click="deleteFoody(f)"></span></td>
-      </tr>
-    </tbody>
-  </table>
-  <label>Choose other endpoint (than this host)</label>
-  <input type="checkbox" ng-model="otherEndpoint">
-  <select ng-show="otherEndpoint" ng-options="e for e in endpoints" ng-model="endpoint" ng-change="refreshFoodies()"></select>
-  <h2>Таблица продуктов</h2>
-  <md-button class="md-raised md-default" ng-click="deleteProductCache()">Сбросить кэш продуктов</md-button>
-  <div>
-    Имя на русском
-    <input ng-model="npRuname">
-    На английском
-    <input ng-model="npName">
-    calories
-    <input ng-model="npCalories" type="number">
-    protein
-    <input ng-model="npProtein" type="number">
-    fat
-    <input ng-model="npFat" type="number">
-    carbs
-    <input ng-model="npCarbs" type="number">
-    <span class="glyphicon glyphicon-floppy-disk" style="cursor: pointer" ng-click="createNewProduct()"></span>
-  </div>
-  Быстрый поиск
-  <input ng-model="searchProduct">
-  <table class="table">
-    <thead>
-      <th>name</th>
-      <th>runame</th>
-      <th>calories</th>
-      <th>protein</th>
-      <th>fat</th>
-      <th>carbs</th>
-      <th></th>
-    </thead>
-    <tbody>
-      <tr ng-repeat="p in products | orderBy: 'p.runame' | filter:searchProduct">
-        <td><input ng-model="p.p.runame"></td>
-        <td><input ng-model="p.p.name"></td>
-        <td><input ng-model="p.p.calories" type="number"></td>
-        <td><input ng-model="p.p.protein" type="number"></td>
-        <td><input ng-model="p.p.fat" type="number"></td>
-        <td><input ng-model="p.p.carbs" type="number"></td>
-        <td>
-          <span class="glyphicon glyphicon-floppy-disk" style="cursor: pointer" ng-click="saveProduct(p.p)"></span>
-          <span class="glyphicon glyphicon-trash" style="cursor: pointer" ng-click="deleteProduct(p.p)"></span>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <md-tabs md-dynamic-height md-border-bottom>
+      <md-tab label="Трекер">
+        <div layout="column" layout-padding>
+          <md-radio-group ng-model="foodperson">
+            <md-radio-button value="alex" class="md-primary">alex</md-radio-button>
+            <md-radio-button value="kristino4ka">kristino4ka</md-radio-button>
+          </md-radio-group>
+        </div>
+        <div layout="row" layout-padding>
+          <md-autocomplete
+              md-selected-item="selectedFood"
+              md-search-text="searchFood"
+              md-items="item in searchProducts(searchFood)"
+              md-item-text="item.p.runame"
+              md-min-length="3"
+              placeholder="Что мы сегодня кушали?"
+              >
+            <md-item-template>
+              <span md-highlight-text="searchFood" md-highlight-flags="^i">{{item.p.name}} {{item.p.runame}}</span>
+            </md-item-template>
+            <md-not-found>
+              No states matching "{{searchText}}" were found.
+              <a ng-click="newProduct(searchText)">Create a new one!</a>
+            </md-not-found>
+          </md-autocomplete>
+          вес
+          <input ng-model="foodweight">
+        </div>
+        <div layout="row" layout-padding>
+          <md-datepicker ng-model="fooddate" md-placeholder=""></md-datepicker>
+          <md-button class="md-raised md-warn" ng-click="putFoody()">Затрекать</md-button>
+        </div>
+        <h2>List of food</h2>
+        <div>
+          <select ng-options="pn for pn in personNames" ng-model="piePerson" ng-change="refreshChart()"></select>
+          <select ng-options="d.desc for d in chartDatePeriods track by d.id" ng-model="pieDate" ng-change="refreshChart()"></select>
+          {{pieChartForDate}}
+          <nvd3 options="pieOptions" data="pieData"></nvd3>
+          <nvd3 options="barChartOptions" data="barData"></nvd3>
+          </div>
+        </div>
+        <table class="table">
+          <thead>
+            <th>ID</th>
+            <th>person</th>
+            <th>date</th>
+            <th>name</th>
+            <th>weight</th>
+            <th></th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="f in foodies | orderBy: 'date' : true">
+              <td>{{f.id}}</td>
+              <td>{{f.person}}</td>
+              <td>{{f.date | date}}</td>
+              <td>{{f.name}}</td>
+              <td>{{f.weight}}</td>
+              <td><span class="glyphicon glyphicon-trash" style="cursor: pointer" ng-click="deleteFoody(f)"></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </md-tab>
+      <md-tab label="Продукты">
+        <h2>Таблица продуктов</h2>
+        <md-button class="md-raised md-default" ng-click="deleteProductCache()">Сбросить кэш продуктов</md-button>
+        <div>
+          Имя на русском
+          <input ng-model="npRuname">
+          На английском
+          <input ng-model="npName">
+          calories
+          <input ng-model="npCalories" type="number">
+          protein
+          <input ng-model="npProtein" type="number">
+          fat
+          <input ng-model="npFat" type="number">
+          carbs
+          <input ng-model="npCarbs" type="number">
+          <span class="glyphicon glyphicon-floppy-disk" style="cursor: pointer" ng-click="createNewProduct()"></span>
+        </div>
+        Быстрый поиск
+        <input ng-model="searchProduct">
+        <table class="table">
+          <thead>
+            <th>name</th>
+            <th>runame</th>
+            <th>calories</th>
+            <th>protein</th>
+            <th>fat</th>
+            <th>carbs</th>
+            <th></th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="p in products | orderBy: 'p.runame' | filter:searchProduct">
+              <td><input ng-model="p.p.runame"></td>
+              <td><input ng-model="p.p.name"></td>
+              <td><input ng-model="p.p.calories"></td>
+              <td><input ng-model="p.p.protein"></td>
+              <td><input ng-model="p.p.fat"></td>
+              <td><input ng-model="p.p.carbs"></td>
+              <td>
+                <span class="glyphicon glyphicon-floppy-disk" style="cursor: pointer" ng-click="saveProduct(p.p)"></span>
+                <span class="glyphicon glyphicon-trash" style="cursor: pointer" ng-click="deleteProduct(p.p)"></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </md-tab>
+      <md-tab label="Управление">
+        <label>Choose other endpoint (than this host)</label>
+        <input type="checkbox" ng-model="otherEndpoint">
+        <select ng-show="otherEndpoint" ng-options="e for e in endpoints" ng-model="endpoint" ng-change="refreshFoodies()"></select>
+      </md-tab>
+  </md-tabs>
 </md-content>
 </body>
 
