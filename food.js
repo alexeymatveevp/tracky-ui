@@ -1,11 +1,20 @@
-var app = angular.module('app', ['nvd3', 'ngMaterial']);
-app.controller('ctrl', function($scope, $http) {
+var app = angular.module('app', ['nvd3', 'ngMaterial', 'ngCookies']);
+app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
     $scope.personNames = ['alex', 'kristino4ka'];
     $scope.endpoints = ['http://localhost:8080', 'http://91.240.84.2:8080', 'http://192.168.10.22:8080', 'http://192.168.10.21:8080'];
     // $scope.endpoint = 'http://localhost:8080';
     $scope.weightHints = [10, 15, 30, 50, 100, 150, 200, 250, 300, 350];
 
-    $scope.putFoody = function() {
+    var person = $cookies.get('person');
+    if (person) {
+      $scope.foodperson = person;
+      $scope.piePerson = person;
+    }
+    $scope.changePerson = function() {
+      $cookies.put('person', $scope.foodperson);
+    }
+
+    $scope.createNewFoody = function() {
       var food = $scope.selectedFood ? $scope.selectedFood.value2 : $scope.searchFood; // in russian :) cooked sausage doctor
       var request = {
         "name": food,
@@ -15,10 +24,14 @@ app.controller('ctrl', function($scope, $http) {
       if ($scope.fooddate) {
         request.date = $scope.fooddate;
       };
+      $scope.saveFoody(request);
+    }
+
+    $scope.saveFoody = function(foody) {
       var prefix = $scope.endpoint ? $scope.endpoint : '';
-      $http.put(prefix + '/foody', request).then(function(res) {
-        console.log(res);
-        $scope.refreshFoodies();
+      $http.post(prefix + '/foody', foody).then(function(res) {
+        // $scope.refreshFoodies();
+        $scope.showToast('Запись сохранена');
       });
     }
 
@@ -39,7 +52,52 @@ app.controller('ctrl', function($scope, $http) {
       });
     }
 
-    $scope.piePerson = 'kristino4ka';
+    $scope.createNewProduct = function() {
+      var newProduct = {
+        "name": $scope.npName,
+        "runame": $scope.npRuname,
+        "calories": $scope.npCalories,
+        "protein": $scope.npProtein,
+        "fat": $scope.npFat,
+        "carbs": $scope.npCarbs,
+      }
+      $scope.saveProduct(newProduct, function(res) {
+        var savedProductId = res.data.data;
+        newProduct.id = savedProductId;
+        $scope.products.push({
+          value1: newProduct.name.toLowerCase(),
+          value2: newProduct.runame.toLowerCase(),
+          p: newProduct
+        });
+        $scope.showToast('Продукт добавлен');
+      });
+    }
+
+    $scope.saveProduct = function(p, successFn) {
+      var prefix = $scope.endpoint ? $scope.endpoint : '';
+      $http.post(prefix + '/product', p).then(successFn);
+    }
+
+    $scope.deleteProduct = function(p) {
+      var prefix = $scope.endpoint ? $scope.endpoint : '';
+      $http.delete(prefix + '/product?id=' + p.id).then(function(res) {
+        var success = res.data.success;
+        if (success) {
+          var idx = $scope.products.indexOf(p);
+          $scope.products.splice(idx, 1);
+        } else {
+          $scope.showToast('Ошибка при удалении');
+        }
+      });
+    }
+
+    $scope.deleteProductCache = function() {
+      var prefix = $scope.endpoint ? $scope.endpoint : '';
+      $http.post(prefix + '/dropProductCache', function(res) {
+        $scope.showToast('Кэш очищен');
+      });
+    }
+
     $scope.chartDatePeriods = [
       {id: 'today', desc: 'Today'},
       {id: 'yesterday', desc: 'Yesterday'},
@@ -161,6 +219,7 @@ app.controller('ctrl', function($scope, $http) {
       });
     }
 
+    $scope.pieDate = {id: 'today', desc: 'Today'};
     $scope.refreshChart();
 
     var prefix = $scope.endpoint ? $scope.endpoint : '';
@@ -186,51 +245,31 @@ app.controller('ctrl', function($scope, $http) {
         return (state.value1.indexOf(lowercaseQuery) !== -1 || state.value2.indexOf(lowercaseQuery) !== -1);
       };
     }
-    $scope.newProduct = function(text) {
 
+    $scope.getToastPosition = function() {
+      return Object.keys($scope.toastPosition)
+        .filter(function(pos) { return $scope.toastPosition[pos]; })
+        .join(' ');
+    };
+
+    function sanitizePosition() {
+      var current = $scope.toastPosition;
+
+      if ( current.bottom && last.top ) current.top = false;
+      if ( current.top && last.bottom ) current.bottom = false;
+      if ( current.right && last.left ) current.left = false;
+      if ( current.left && last.right ) current.right = false;
+
+      last = angular.extend({},current);
     }
 
-    $scope.createNewProduct = function() {
-      var newProduct = {
-        "name": $scope.npName,
-        "runame": $scope.npRuname,
-        "calories": $scope.npCalories,
-        "protein": $scope.npProtein,
-        "fat": $scope.npFat,
-        "carbs": $scope.npCarbs,
-      }
-      $scope.saveProduct(newProduct, function(res) {
-        var savedProductId = res.data.data;
-        newProduct.id = savedProductId;
-        $scope.products.push({
-          value1: newProduct.name.toLowerCase(),
-          value2: newProduct.runame.toLowerCase(),
-          p: newProduct
-        });
-      });
-    }
-
-    $scope.saveProduct = function(p, successFn) {
-      var prefix = $scope.endpoint ? $scope.endpoint : '';
-      $http.post(prefix + '/product', p).then(successFn);
-    }
-
-    $scope.deleteProduct = function(p) {
-      var prefix = $scope.endpoint ? $scope.endpoint : '';
-      $http.delete(prefix + '/product?id=' + p.id).then(function(res) {
-        var success = res.data.success;
-        if (success) {
-          var idx = $scope.products.indexOf(p);
-          $scope.products.splice(idx, 1);
-        } else {
-          alert('delete failed');
-        }
-      });
-    }
-
-    $scope.deleteProductCache = function() {
-      var prefix = $scope.endpoint ? $scope.endpoint : '';
-      $http.post(prefix + '/dropProductCache');
+    $scope.showToast = function(text) {
+      $mdToast.show(
+        $mdToast.simple()
+          .textContent(text)
+          .position({top: true, right: true})
+          .hideDelay(3000)
+      );
     }
 
 });

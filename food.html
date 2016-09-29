@@ -18,12 +18,12 @@
   <md-tabs md-dynamic-height md-border-bottom>
       <md-tab label="Трекер">
         <div layout="column" layout-padding>
-          <md-radio-group ng-model="foodperson">
+          <md-radio-group ng-model="foodperson" ng-change="changePerson()">
             <md-radio-button value="alex" class="md-primary">alex</md-radio-button>
             <md-radio-button value="kristino4ka">kristino4ka</md-radio-button>
           </md-radio-group>
         </div>
-        <div layout="row" layout-padding>
+        <div layout="column" layout-padding>
           <md-autocomplete
               md-selected-item="selectedFood"
               md-search-text="searchFood"
@@ -45,7 +45,7 @@
         </div>
         <div layout="row" layout-padding>
           <md-datepicker ng-model="fooddate" md-placeholder=""></md-datepicker>
-          <md-button class="md-raised md-warn" ng-click="putFoody()">Затрекать</md-button>
+          <md-button class="md-raised md-warn" ng-click="createNewFoody()">Затрекать</md-button>
         </div>
         <h2>List of food</h2>
         <div>
@@ -58,7 +58,6 @@
         </div>
         <table class="table">
           <thead>
-            <th>ID</th>
             <th>person</th>
             <th>date</th>
             <th>name</th>
@@ -67,12 +66,14 @@
           </thead>
           <tbody>
             <tr ng-repeat="f in foodies | orderBy: 'date' : true">
-              <td>{{f.id}}</td>
-              <td>{{f.person}}</td>
-              <td>{{f.date | date}}</td>
-              <td>{{f.name}}</td>
-              <td>{{f.weight}}</td>
-              <td><span class="glyphicon glyphicon-trash" style="cursor: pointer" ng-click="deleteFoody(f)"></span></td>
+              <td><input ng-model="f.person"></td>
+              <td>{{f.date}}</td>
+              <td><input ng-model="f.name"></td>
+              <td><input ng-model="f.weight"></td>
+              <td>
+                <span class="glyphicon glyphicon-floppy-disk" style="cursor: pointer" ng-click="saveFoody(f)"></span>
+                <span class="glyphicon glyphicon-trash" style="cursor: pointer" ng-click="deleteFoody(f)"></span>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -138,6 +139,7 @@
 <script src="lib/angular-nvd3.min.js"></script>
 <script src="lib/angular-animate.min.js"></script>
 <script src="lib/angular-aria.min.js"></script>
+<script src="lib/angular-cookies.min.js"></script>
 <script src="lib/angular-material.min.js"></script>
 <script src="food.js"></script>
 <link rel="stylesheet" href="bootstrap.css"/>
