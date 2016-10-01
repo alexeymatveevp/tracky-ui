@@ -7,7 +7,7 @@
   <title>Food tracking</title>
 </head>
 <body ng-controller="ctrl">
-<md-content>
+<md-content layout="column">
   <md-toolbar class="md-hue-2">
     <div class="md-toolbar-tools">
       <h2>
@@ -15,8 +15,8 @@
       </h2>
     </div>
   </md-toolbar>
-  <md-tabs md-dynamic-height md-border-bottom>
-      <md-tab label="Трекер">
+  <md-tabs md-dynamic-height md-border-bottom layout-fill>
+      <md-tab label="Трекер" md-stretch-tabs="yes">
         <div layout="column" layout-padding>
           <md-radio-group ng-model="foodperson" ng-change="changePerson()">
             <md-radio-button value="alex" class="md-primary">alex</md-radio-button>
@@ -35,10 +35,10 @@
             <md-item-template>
               <span md-highlight-text="searchFood" md-highlight-flags="^i">{{item.p.name}} {{item.p.runame}}</span>
             </md-item-template>
-            <md-not-found>
+            <!-- <md-not-found>
               No states matching "{{searchText}}" were found.
               <a ng-click="newProduct(searchText)">Create a new one!</a>
-            </md-not-found>
+            </md-not-found> -->
           </md-autocomplete>
           вес
           <input ng-model="foodweight">
@@ -47,7 +47,7 @@
           <md-datepicker ng-model="fooddate" md-placeholder=""></md-datepicker>
           <md-button class="md-raised md-warn" ng-click="createNewFoody()">Затрекать</md-button>
         </div>
-        <h2>List of food</h2>
+
         <div>
           <select ng-options="pn for pn in personNames" ng-model="piePerson" ng-change="refreshChart()"></select>
           <select ng-options="d.desc for d in chartDatePeriods track by d.id" ng-model="pieDate" ng-change="refreshChart()"></select>
@@ -56,31 +56,43 @@
           <nvd3 options="barChartOptions" data="barData"></nvd3>
           </div>
         </div>
-        <table class="table">
-          <thead>
-            <th>person</th>
-            <th>date</th>
-            <th>name</th>
-            <th>weight</th>
-            <th></th>
-          </thead>
-          <tbody>
-            <tr ng-repeat="f in foodies | orderBy: 'date' : true">
-              <td><input ng-model="f.person"></td>
-              <td>{{f.date}}</td>
-              <td><input ng-model="f.name"></td>
-              <td><input ng-model="f.weight"></td>
-              <td>
-                <span class="glyphicon glyphicon-floppy-disk" style="cursor: pointer" ng-click="saveFoody(f)"></span>
-                <span class="glyphicon glyphicon-trash" style="cursor: pointer" ng-click="deleteFoody(f)"></span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+
+        <h2>Список съеденного</h2>
+        Быстрый поиск
+        <input ng-model="searchFoody" ng-model-options="{debounce: 700}">
+        <button ng-disabled="foodiesCurrentPage == 0" ng-click="foodiesCurrentPage=foodiesCurrentPage-1">
+            Previous
+        </button>
+        {{foodiesCurrentPage+1}}/{{numberOfPages(foodies)}}
+        <button ng-disabled="foodiesCurrentPage >= foodies.length/pageSize - 1" ng-click="foodiesCurrentPage=foodiesCurrentPage+1">
+            Next
+        </button>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <th>person</th>
+              <th>date</th>
+              <th>name</th>
+              <th>weight</th>
+              <th></th>
+            </thead>
+            <tbody>
+              <tr ng-repeat="f in foodies | orderBy: 'date' : true | filter:searchFoody | startFrom:foodiesCurrentPage*pageSize | limitTo:pageSize">
+                <td><input ng-model="f.person"></td>
+                <td><input type="date" ng-model="f.date"></td>
+                <td><input ng-model="f.name"></td>
+                <td><input ng-model="f.weight"></td>
+                <td>
+                  <span class="glyphicon glyphicon-floppy-disk" style="cursor: pointer" ng-click="saveFoody(f)"></span>
+                  <span class="glyphicon glyphicon-trash" style="cursor: pointer" ng-click="deleteFoody(f)"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </md-tab>
       <md-tab label="Продукты">
         <h2>Таблица продуктов</h2>
-        <md-button class="md-raised md-default" ng-click="deleteProductCache()">Сбросить кэш продуктов</md-button>
         <div>
           Имя на русском
           <input ng-model="npRuname">
@@ -97,34 +109,46 @@
           <span class="glyphicon glyphicon-floppy-disk" style="cursor: pointer" ng-click="createNewProduct()"></span>
         </div>
         Быстрый поиск
-        <input ng-model="searchProduct">
-        <table class="table">
-          <thead>
-            <th>name</th>
-            <th>runame</th>
-            <th>calories</th>
-            <th>protein</th>
-            <th>fat</th>
-            <th>carbs</th>
-            <th></th>
-          </thead>
-          <tbody>
-            <tr ng-repeat="p in products | orderBy: 'p.runame' | filter:searchProduct">
-              <td><input ng-model="p.p.runame"></td>
-              <td><input ng-model="p.p.name"></td>
-              <td><input ng-model="p.p.calories"></td>
-              <td><input ng-model="p.p.protein"></td>
-              <td><input ng-model="p.p.fat"></td>
-              <td><input ng-model="p.p.carbs"></td>
-              <td>
-                <span class="glyphicon glyphicon-floppy-disk" style="cursor: pointer" ng-click="saveProduct(p.p)"></span>
-                <span class="glyphicon glyphicon-trash" style="cursor: pointer" ng-click="deleteProduct(p.p)"></span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <input ng-model="searchProduct" ng-model-options="{debounce: 700}">
+        <button ng-disabled="productsCurrentPage == 0" ng-click="productsCurrentPage=productsCurrentPage-1">
+            Previous
+        </button>
+        {{productsCurrentPage+1}}/{{numberOfPages(products)}}
+        <button ng-disabled="productsCurrentPage >= products.length/pageSize - 1" ng-click="productsCurrentPage=productsCurrentPage+1">
+            Next
+        </button>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <th>name</th>
+              <th>runame</th>
+              <th>calories</th>
+              <th>protein</th>
+              <th>fat</th>
+              <th>carbs</th>
+              <th></th>
+            </thead>
+            <tbody>
+              <tr ng-repeat="p in products | orderBy: 'p.runame' | filter:searchProduct | startFrom:productsCurrentPage*pageSize | limitTo:pageSize">
+                <td><input ng-model="p.p.runame"></td>
+                <td><input ng-model="p.p.name"></td>
+                <td><input ng-model="p.p.calories"></td>
+                <td><input ng-model="p.p.protein"></td>
+                <td><input ng-model="p.p.fat"></td>
+                <td><input ng-model="p.p.carbs"></td>
+                <td>
+                  <span class="glyphicon glyphicon-floppy-disk" style="cursor: pointer" ng-click="saveProduct(p.p)"></span>
+                  <span class="glyphicon glyphicon-trash" style="cursor: pointer" ng-click="deleteProduct(p.p)"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </md-tab>
       <md-tab label="Управление">
+        <md-button class="md-raised md-default" ng-click="deleteProductCache()">Сбросить кэш продуктов</md-button>
+        <md-button class="md-raised md-default" ng-click="deleteFoodyCache()">Сбросить кэш фудизов</md-button>
+        <md-button class="md-raised md-default" ng-click="showToast('awefawf')">tost</md-button>
         <label>Choose other endpoint (than this host)</label>
         <input type="checkbox" ng-model="otherEndpoint">
         <select ng-show="otherEndpoint" ng-options="e for e in endpoints" ng-model="endpoint" ng-change="refreshFoodies()"></select>
@@ -152,6 +176,16 @@ nvd3 > svg {
 md-autocomplete > md-autocomplete-wrap {
   background: white;
   border: 1px black solid;
+}
+[role="tabpanel"] {
+    transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s;
+    position: absolute;
+}
+[role="tabpanel"].ng-enter, [role="tabpanel"].ng-leave.ng-leave-active  {
+
+}
+[role="tabpanel"] {
+    transition: none;
 }
 </style>
 </html>

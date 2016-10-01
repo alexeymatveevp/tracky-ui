@@ -1,4 +1,5 @@
 var app = angular.module('app', ['nvd3', 'ngMaterial', 'ngCookies']);
+
 app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
     $scope.personNames = ['alex', 'kristino4ka'];
     $scope.endpoints = ['http://localhost:8080', 'http://91.240.84.2:8080', 'http://192.168.10.22:8080', 'http://192.168.10.21:8080'];
@@ -15,25 +16,30 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
 
     $scope.createNewFoody = function() {
       var food = $scope.selectedFood ? $scope.selectedFood.value2 : $scope.searchFood; // save foody in russian :) cooked sausage doctor
-      var request = {
+      var foody = {
         "name": food,
         "person": $scope.foodperson,
         "weight": $scope.foodweight
       };
       if ($scope.fooddate) {
-        request.date = $scope.fooddate;
+        foody.date = $scope.fooddate;
       };
-      $scope.saveFoody(request);
-    }
-
-    $scope.saveFoody = function(foody) {
-      var prefix = $scope.endpoint ? $scope.endpoint : '';
-      $http.post(prefix + '/foody', foody).then(function(res) {
+      $scope.saveFoody(foody, function(res) {
         var savedFoodyId = res.data.data;
         foody.id = savedFoodyId;
-        $scope.foodies.push(foody)
+        $scope.foodies.push(foody);
         $scope.showToast('Запись сохранена');
       });
+    }
+
+    $scope.saveFoody = function(foody, successFn) {
+      var prefix = $scope.endpoint ? $scope.endpoint : '';
+      if (!successFn) {
+        successFn = function() {
+          $scope.showToast('Фуди сохранен');
+        }
+      }
+      $http.post(prefix + '/foody', foody).then(successFn);
     }
 
     $scope.deleteFoody = function(foody) {
@@ -41,6 +47,7 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
       $http.delete(prefix + '/foody?id=' + foody.id).then(function(res) {
         var idx = $scope.foodies.indexOf(foody);
         $scope.foodies.splice(idx, 1);
+        $scope.showToast('Фуди удален');
       });
     }
 
@@ -67,6 +74,11 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
 
     $scope.saveProduct = function(p, successFn) {
       var prefix = $scope.endpoint ? $scope.endpoint : '';
+      if (!successFn) {
+        successFn = function() {
+          $scope.showToast('Продукт сохранен');
+        }
+      }
       $http.post(prefix + '/product', p).then(successFn);
     }
 
@@ -77,6 +89,7 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
         if (success) {
           var idx = $scope.products.indexOf(p);
           $scope.products.splice(idx, 1);
+          $scope.showToast('Продукт удален');
         } else {
           $scope.showToast('Ошибка при удалении');
         }
@@ -100,7 +113,14 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
     // load foodies
     var prefix = $scope.endpoint ? $scope.endpoint : '';
     $http.get(prefix + '/foodies').then(function(res) {
-      $scope.foodies = res.data;
+      // replace timestamp with date
+      var foodies = [];
+      for (var i in res.data) {
+        var f = res.data[i];
+        f.date = new Date(f.date);
+        foodies.push(f);
+      }
+      $scope.foodies = foodies;
     });
 
     // cache control
@@ -271,12 +291,37 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
     }
 
     $scope.showToast = function(text) {
-      $mdToast.show(
-        $mdToast.simple()
-          .textContent(text)
-          .position({top: true, right: true})
-          .hideDelay(3000)
-      );
+      // $mdToast.show(
+      //   $mdToast.simple()
+      //     .textContent(text)
+      //     .position({top: true, right: true})
+      //     .hideDelay(3000)
+      // );
+      $mdToast.show({
+        template: '<md-toast>' + text + '</md-toast>',
+        hideDelay: 2000,
+        position: 'bottom left'
+      });
     }
 
+    // paging
+    $scope.productsCurrentPage = 0;
+    $scope.foodiesCurrentPage = 0;
+    $scope.pageSize = 10;
+    $scope.numberOfPages = function(collection) {
+      if (collection) {
+        return Math.ceil(collection.length/$scope.pageSize);
+      }
+      return 1;
+    }
+
+});
+
+app.filter('startFrom', function() {
+    return function(input, start) {
+      if (input) {
+        start = +start; //parse to int
+        return input.slice(start);
+      }
+    }
 });
