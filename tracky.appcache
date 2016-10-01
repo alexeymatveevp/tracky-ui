@@ -1,0 +1,21 @@
+CACHE MANIFEST
+# 2016-01-10 v1.0.0
+/lib/angular.min.js
+/lib/angular-animate.min.js
+/lib/angular-aria.min.js
+/lib/angular-cookies.min.js
+/lib/angular-material.min.css
+/lib/angular-material.min.js
+/lib/angular-nvd3.min.js
+/lib/d3.js
+/lib/nv.d3.min.css
+/lib/nv.d3.min.js
+/fonts/glyphicons-halflings-regular.eot
+/fonts/glyphicons-halflings-regular.svg
+/fonts/glyphicons-halflings-regular.ttf
+/fonts/glyphicons-halflings-regular.woff
+/fonts/glyphicons-halflings-regular.woff2
+/bootstrap.css
+
+NETWORK:
+*

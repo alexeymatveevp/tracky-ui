@@ -2,8 +2,7 @@ var app = angular.module('app', ['nvd3', 'ngMaterial', 'ngCookies']);
 app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
     $scope.personNames = ['alex', 'kristino4ka'];
     $scope.endpoints = ['http://localhost:8080', 'http://91.240.84.2:8080', 'http://192.168.10.22:8080', 'http://192.168.10.21:8080'];
-    // $scope.endpoint = 'http://localhost:8080';
-    $scope.weightHints = [10, 15, 30, 50, 100, 150, 200, 250, 300, 350];
+    $scope.endpoint = 'http://localhost:8080';
 
     var person = $cookies.get('person');
     if (person) {
@@ -15,7 +14,7 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
     }
 
     $scope.createNewFoody = function() {
-      var food = $scope.selectedFood ? $scope.selectedFood.value2 : $scope.searchFood; // in russian :) cooked sausage doctor
+      var food = $scope.selectedFood ? $scope.selectedFood.value2 : $scope.searchFood; // save foody in russian :) cooked sausage doctor
       var request = {
         "name": food,
         "person": $scope.foodperson,
@@ -30,19 +29,12 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
     $scope.saveFoody = function(foody) {
       var prefix = $scope.endpoint ? $scope.endpoint : '';
       $http.post(prefix + '/foody', foody).then(function(res) {
-        // $scope.refreshFoodies();
+        var savedFoodyId = res.data.data;
+        foody.id = savedFoodyId;
+        $scope.foodies.push(foody)
         $scope.showToast('Запись сохранена');
       });
     }
-
-    $scope.refreshFoodies = function() {
-      var prefix = $scope.endpoint ? $scope.endpoint : '';
-      $http.get(prefix + '/foodies').then(function(res) {
-        $scope.foodies = res.data;
-      })
-    }
-
-    $scope.refreshFoodies();
 
     $scope.deleteFoody = function(foody) {
       var prefix = $scope.endpoint ? $scope.endpoint : '';
@@ -91,13 +83,41 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
       });
     }
 
+    // load products
+    var prefix = $scope.endpoint ? $scope.endpoint : '';
+    $http.get(prefix + '/allProducts').then(function(res) {
+      var products = [];
+      for (var i in res.data) {
+        var p = res.data[i];
+        products.push({
+          value1: p.name.toLowerCase(),
+          value2: p.runame.toLowerCase(),
+          p: p
+        });
+      }
+      $scope.products = products;
+    });
+    // load foodies
+    var prefix = $scope.endpoint ? $scope.endpoint : '';
+    $http.get(prefix + '/foodies').then(function(res) {
+      $scope.foodies = res.data;
+    });
+
+    // cache control
     $scope.deleteProductCache = function() {
       var prefix = $scope.endpoint ? $scope.endpoint : '';
       $http.post(prefix + '/dropProductCache', function(res) {
-        $scope.showToast('Кэш очищен');
+        $scope.showToast('Кэш продуктов очищен');
+      });
+    }
+    $scope.deleteFoodyCache = function() {
+      var prefix = $scope.endpoint ? $scope.endpoint : '';
+      $http.post(prefix + '/dropProductCache', function(res) {
+        $scope.showToast('Кэш фуди очищен');
       });
     }
 
+    // charts
     $scope.chartDatePeriods = [
       {id: 'today', desc: 'Today'},
       {id: 'yesterday', desc: 'Yesterday'},
@@ -222,19 +242,6 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
     $scope.pieDate = {id: 'today', desc: 'Today'};
     $scope.refreshChart();
 
-    var prefix = $scope.endpoint ? $scope.endpoint : '';
-    $http.get(prefix + '/allProducts').then(function(res) {
-      var products = [];
-      for (var i in res.data) {
-        var p = res.data[i];
-        products.push({
-          value1: p.name.toLowerCase(),
-          value2: p.runame.toLowerCase(),
-          p: p
-        });
-      }
-      $scope.products = products;
-    })
     $scope.searchProducts = function(query) {
       var results = query ? $scope.products.filter(createFilterFor(query)) : $scope.products;
       return results;
