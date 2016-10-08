@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app" manifest="tracky.appcache" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Food tracking</title>
+  <script src="lib/angular.min.js"></script>
+  <script src="lib/d3.js"></script>
+  <script src="lib/nv.d3.min.js"></script>
+  <script src="lib/angular-nvd3.min.js"></script>
+  <script src="lib/angular-animate.min.js"></script>
+  <script src="lib/angular-aria.min.js"></script>
+  <script src="lib/angular-cookies.min.js"></script>
+  <script src="lib/angular-material.min.js"></script>
+  <script src="lib/moment.min.js"></script>
+  <script src="food.js"></script>
+  <link rel="stylesheet" href="bootstrap.css"/>
+  <link rel="stylesheet" href="lib/nv.d3.min.css"/>
+  <link rel="stylesheet" href="lib/angular-material.min.css"/>
+  <style>
+  nvd3 > svg {
+    display: inline-block!important;
+  }
+  md-autocomplete > md-autocomplete-wrap {
+    background: white;
+    border: 1px black solid;
+  }
+  [role="tabpanel"] {
+      transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s;
+      position: absolute;
+  }
+  [role="tabpanel"] {
+      transition: none;
+  }
+  [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+  }
+  </style>
+</head>
+<body ng-controller="ctrl">
+  <foody-app></foody-app>
+</body>
+</html>

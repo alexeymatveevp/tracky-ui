@@ -1,18 +1,16 @@
-<!DOCTYPE html>
-<html lang="en" ng-app="app" manifest="tracky.appcache">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Food tracking</title>
-</head>
-<body ng-controller="ctrl">
 <md-content layout="column">
   <md-toolbar class="md-hue-2">
     <div class="md-toolbar-tools">
       <h2>
         <span>Foody - трекер питания <span class="glyphicon glyphicon-cutlery"></span></span>
       </h2>
+      <span flex></span>
+      <md-button class="md-icon-button" aria-label="Favorite">
+        <!-- <md-icon md-svg-icon="img/icons/favorite.svg" style="color: greenyellow;"></md-icon> -->
+      </md-button>
+      <md-button class="md-icon-button" aria-label="More">
+        <md-icon md-svg-icon="img/icons/more_vert.svg"></md-icon>
+      </md-button>
     </div>
   </md-toolbar>
   <md-tabs md-dynamic-height md-border-bottom layout-fill>
@@ -49,12 +47,35 @@
         </div>
 
         <div>
-          <select ng-options="pn for pn in personNames" ng-model="piePerson" ng-change="refreshChart()"></select>
+          <select ng-options="pn for pn in personNames" ng-model="foodperson" ng-change="refreshChart()"></select>
           <select ng-options="d.desc for d in chartDatePeriods track by d.id" ng-model="pieDate" ng-change="refreshChart()"></select>
           {{pieChartForDate}}
-          <nvd3 options="pieOptions" data="pieData"></nvd3>
-          <nvd3 options="barChartOptions" data="barData"></nvd3>
-          </div>
+          <md-grid-list md-cols="3" md-cols-xs="1" md-cols-sm="1" md-cols-md="2"
+                        md-gutter="12px"
+                        md-row-height="600px"
+                        >
+            <md-grid-tile md-rowspan="1"
+                          md-colspan="1"
+                          md-colspan-sm="1"
+                          md-colspan-xs="1">
+              <nvd3 options="pieOptions" data="pieData"></nvd3>
+              <md-grid-tile-header><h3>Калорий за период</h3></md-grid-tile-header>
+            </md-grid-tile>
+            <md-grid-tile md-rowspan="1"
+                          md-colspan="1"
+                          md-colspan-sm="1"
+                          md-colspan-xs="1">
+              <nvd3 options="barChartOptions" data="barData"></nvd3>
+              <md-grid-tile-header><h3>Калорий за день</h3></md-grid-tile-header>
+            </md-grid-tile>
+            <md-grid-tile md-rowspan="1"
+                          md-colspan="1"
+                          md-colspan-sm="1"
+                          md-colspan-xs="1">
+              <h3>Another graph</h3>
+              <md-grid-tile-header><h3>Калорий за день</h3></md-grid-tile-header>
+            </md-grid-tile>
+          </md-grid-list>
         </div>
 
         <h2>Список съеденного</h2>
@@ -155,37 +176,3 @@
       </md-tab>
   </md-tabs>
 </md-content>
-</body>
-
-<script src="lib/angular.min.js"></script>
-<script src="lib/d3.js"></script>
-<script src="lib/nv.d3.min.js"></script>
-<script src="lib/angular-nvd3.min.js"></script>
-<script src="lib/angular-animate.min.js"></script>
-<script src="lib/angular-aria.min.js"></script>
-<script src="lib/angular-cookies.min.js"></script>
-<script src="lib/angular-material.min.js"></script>
-<script src="food.js"></script>
-<link rel="stylesheet" href="bootstrap.css"/>
-<link rel="stylesheet" href="lib/nv.d3.min.css"/>
-<link rel="stylesheet" href="lib/angular-material.min.css"/>
-<style>
-nvd3 > svg {
-  display: inline-block!important;
-}
-md-autocomplete > md-autocomplete-wrap {
-  background: white;
-  border: 1px black solid;
-}
-[role="tabpanel"] {
-    transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s;
-    position: absolute;
-}
-[role="tabpanel"].ng-enter, [role="tabpanel"].ng-leave.ng-leave-active  {
-
-}
-[role="tabpanel"] {
-    transition: none;
-}
-</style>
-</html>

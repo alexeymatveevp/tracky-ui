@@ -4,14 +4,16 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
     $scope.personNames = ['alex', 'kristino4ka'];
     $scope.endpoints = ['http://localhost:8080', 'http://91.240.84.2:8080', 'http://192.168.10.22:8080', 'http://192.168.10.21:8080'];
     // $scope.endpoint = 'http://localhost:8080';
+    $scope.foodperson = 'kristino4ka';
 
     var person = $cookies.get('person');
     if (person) {
       $scope.foodperson = person;
-      $scope.piePerson = person;
     }
     $scope.changePerson = function() {
-      $cookies.put('person', $scope.foodperson);
+      $cookies.put('person', $scope.foodperson, {
+        expires: new Date(11111111111111) // somewhere around 2322
+      });
     }
 
     $scope.createNewFoody = function() {
@@ -39,6 +41,8 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
           $scope.showToast('Фуди сохранен');
         }
       }
+      // format the date
+      foody.date = moment(foody.date).hours(12).toDate();
       $http.post(prefix + '/foody', foody).then(successFn);
     }
 
@@ -151,8 +155,8 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
     $scope.pieOptions = {
       chart: {
         type: 'pieChart',
-        height: 500,
-        width: 500,
+        height: 450,
+        width: 450,
         x: function(d){return d.x;},
         y: function(d){return d.y;},
         showLabels: true,
@@ -167,18 +171,14 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
             left: 0
           }
         }
-      },
-      title: {
-        enable: true,
-        text: 'Calories distribution'
       }
     };
 
     $scope.barChartOptions = {
         chart: {
             type: 'historicalBarChart',
-            height: 450,
-            width: 500,
+            height: 400,
+            width: 400,
             margin : {
                 top: 20,
                 right: 20,
@@ -221,7 +221,7 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
             bars: {
               dispatch: {
                 elementClick: function(t,u) {
-                  $scope.refreshChart(t.data[0]);
+                  $scope.refreshChart(moment(t.data[0]).hours(12).toDate());
                 }
               }
             }
@@ -237,20 +237,20 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
         }
     };
 
-    $scope.refreshChart = function(timestamp) {
+    $scope.refreshChart = function(date) {
       var prefix = $scope.endpoint ? $scope.endpoint : '';
-      var dateParam = $scope.pieDate ? '&specificPeriod=' + $scope.pieDate.id : '';
-      var timestampParam = timestamp ? '&timestamp=' + timestamp : '';
-      if (timestamp) {
-        $scope.pieChartForDate = new Date(timestamp);
+      var specificPeriodParam = $scope.pieDate ? '&specificPeriod=' + $scope.pieDate.id : '';
+      var dateParam = date ? '&date=' + moment(date).format('MM.DD.YYYY') : '';
+      if (date) {
+        $scope.pieChartForDate = new Date(date);
       } else if ($scope.pieDate) {
         $scope.pieChartForDate = $scope.pieDate.desc;
       }
 
-      $http.get(prefix + '/caloriesChart?personName=' + $scope.piePerson + dateParam + timestampParam).then(function(res) {
+      $http.get(prefix + '/caloriesChart?personName=' + $scope.foodperson + dateParam + specificPeriodParam).then(function(res) {
         $scope.pieData = res.data;
       });
-      $http.get(prefix + '/barChart?personName=' + $scope.piePerson).then(function(res) {
+      $http.get(prefix + '/barChart?personName=' + $scope.foodperson).then(function(res) {
         $scope.barData = [{
           key: "Calories distribution",
           bar: true,
@@ -324,4 +324,10 @@ app.filter('startFrom', function() {
         return input.slice(start);
       }
     }
+});
+
+app.directive('foodyApp', function() {
+  return {
+    templateUrl: 'food.html'
+  }
 });
