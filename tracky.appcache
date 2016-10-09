@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# 2016-01-10 v1.0.1
+# 2016-01-10 v1.0.2
 /lib/angular.min.js
 /lib/angular-animate.min.js
 /lib/angular-aria.min.js
@@ -10,6 +10,7 @@ CACHE MANIFEST
 /lib/d3.js
 /lib/nv.d3.min.css
 /lib/nv.d3.min.js
+/lib/ng-google-chart.js
 /fonts/glyphicons-halflings-regular.eot
 /fonts/glyphicons-halflings-regular.svg
 /fonts/glyphicons-halflings-regular.ttf

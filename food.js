@@ -1,6 +1,6 @@
-var app = angular.module('app', ['nvd3', 'ngMaterial', 'ngCookies']);
+var app = angular.module('app', ['nvd3', 'ngMaterial', 'ngCookies', 'googlechart']);
 
-app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
+app.controller('ctrl', function($scope, $http,$rootScope, $mdToast, $cookies) {
     $scope.personNames = ['alex', 'kristino4ka'];
     $scope.endpoints = ['http://localhost:8080', 'http://91.240.84.2:8080', 'http://192.168.10.22:8080', 'http://192.168.10.21:8080'];
     // $scope.endpoint = 'http://localhost:8080';
@@ -14,6 +14,7 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
       $cookies.put('person', $scope.foodperson, {
         expires: new Date(11111111111111) // somewhere around 2322
       });
+      $scope.refreshChart();
     }
 
     $scope.createNewFoody = function() {
@@ -174,68 +175,68 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
       }
     };
 
-    $scope.barChartOptions = {
-        chart: {
-            type: 'historicalBarChart',
-            height: 400,
-            width: 400,
-            margin : {
-                top: 20,
-                right: 20,
-                bottom: 65,
-                left: 65
-            },
-            x: function(d){return d[0];},
-            y: function(d){return d[1];},
-            // clipEdge: true,
-            duration: 500,
-            xAxis: {
-                axisLabel: 'Date',
-                showMaxMin: false,
-                // rotateLabels: 30,
-                tickFormat: function(d){
-                    // return d3.format(',f')(d);
-                    // return new Date(d);
-                    return d3.time.format("%d-%m")(new Date(d));
-                },
-            },
-            yAxis: {
-                axisLabel: 'Calories',
-                axisLabelDistance: -20,
-                tickFormat: function(d){
-                    return d3.format(',.1f')(d);
-                },
-            },
-            tooltip: {
-              // headerEnabled: true,
-              // headerFormatter: function(d,q,e) {
-              //   return 'asdf';
-              // },
-              valueFormatter: function (d, i) {
-                return d3.format(',.1f')(d) + ' calories';
-              },
-              keyFormatter: function(d) {
-                return d3.time.format("%d-%m")(new Date(d));
-              }
-            },
-            bars: {
-              dispatch: {
-                elementClick: function(t,u) {
-                  $scope.refreshChart(moment(t.data[0]).hours(12).toDate());
-                }
-              }
-            }
-            // zoom: {
-            //     enabled: true,
-            //     scaleExtent: [1, 10],
-            //     useFixedDomain: false,
-            //     useNiceScale: false,
-            //     horizontalOff: false,
-            //     verticalOff: true,
-            //     unzoomEventType: 'dblclick.zoom'
-            // }
-        }
-    };
+    // $scope.barChartOptions = {
+    //     chart: {
+    //         type: 'historicalBarChart',
+    //         height: 400,
+    //         width: 400,
+    //         margin : {
+    //             top: 20,
+    //             right: 20,
+    //             bottom: 65,
+    //             left: 65
+    //         },
+    //         x: function(d){return d[0];},
+    //         y: function(d){return d[1];},
+    //         // clipEdge: true,
+    //         duration: 500,
+    //         xAxis: {
+    //             axisLabel: 'Date',
+    //             showMaxMin: false,
+    //             // rotateLabels: 30,
+    //             tickFormat: function(d){
+    //                 // return d3.format(',f')(d);
+    //                 // return new Date(d);
+    //                 return d3.time.format("%d-%m")(new Date(d));
+    //             },
+    //         },
+    //         yAxis: {
+    //             axisLabel: 'Calories',
+    //             axisLabelDistance: -20,
+    //             tickFormat: function(d){
+    //                 return d3.format(',.1f')(d);
+    //             },
+    //         },
+    //         tooltip: {
+    //           // headerEnabled: true,
+    //           // headerFormatter: function(d,q,e) {
+    //           //   return 'asdf';
+    //           // },
+    //           valueFormatter: function (d, i) {
+    //             return d3.format(',.1f')(d) + ' calories';
+    //           },
+    //           keyFormatter: function(d) {
+    //             return d3.time.format("%d-%m")(new Date(d));
+    //           }
+    //         },
+    //         bars: {
+    //           dispatch: {
+    //             elementClick: function(t,u) {
+    //               $scope.refreshChart(moment(t.data[0]).hours(12).toDate());
+    //             }
+    //           }
+    //         }
+    //         // zoom: {
+    //         //     enabled: true,
+    //         //     scaleExtent: [1, 10],
+    //         //     useFixedDomain: false,
+    //         //     useNiceScale: false,
+    //         //     horizontalOff: false,
+    //         //     verticalOff: true,
+    //         //     unzoomEventType: 'dblclick.zoom'
+    //         // }
+    //     }
+    // };
 
     $scope.refreshChart = function(date) {
       var prefix = $scope.endpoint ? $scope.endpoint : '';
@@ -250,13 +251,13 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
       $http.get(prefix + '/caloriesChart?personName=' + $scope.foodperson + dateParam + specificPeriodParam).then(function(res) {
         $scope.pieData = res.data;
       });
-      $http.get(prefix + '/barChart?personName=' + $scope.foodperson).then(function(res) {
-        $scope.barData = [{
-          key: "Calories distribution",
-          bar: true,
-          values: res.data
-        }];
-      });
+      // $http.get(prefix + '/barChart?personName=' + $scope.foodperson).then(function(res) {
+      //   $scope.barData = [{
+      //     key: "Calories distribution",
+      //     bar: true,
+      //     values: res.data
+      //   }];
+      // });
     }
 
     $scope.pieDate = {id: 'today', desc: 'Today'};
@@ -313,6 +314,121 @@ app.controller('ctrl', function($scope, $http, $mdToast, $cookies) {
         return Math.ceil(collection.length/$scope.pageSize);
       }
       return 1;
+    }
+
+    $rootScope.showWeeklyCalories = true;
+    $scope.weeklyCaloriesChart = {
+      type: 'ColumnChart',
+      options: {
+          title: "Калории в неделю",
+          // isStacked: true,
+          fill: 20,
+          legend: { position: 'top', maxLines: 1 },
+          // displayExactValues: true,
+          vAxis: {
+            title: "Калории",
+            gridlines: {count: 4},
+            // minValue: 0,
+            // ticks: [0, .3, .6, .9, 1]
+          },
+          hAxis: {
+              title: "День"
+          }
+      },
+      // formatters: {
+      //     date: [{
+              // formatType: 'short',
+      //         colIndex: 1,
+      //         pattern: "HH:mm:ss dd:MM:yy"
+      //     }]
+      // }
+    };
+    $scope.weeklyWeightChart = {
+      type: 'ColumnChart',
+      displayed: false,
+      options: {
+          title: "Вес в неделю",
+          isStacked: true,
+          fill: 20,
+          legend: { position: 'top', maxLines: 1 },
+          // displayExactValues: true,
+          vAxis: {
+            title: "Вес",
+            gridlines: {count: 4},
+            // minValue: 0,
+            // ticks: [0, .3, .6, .9, 1]
+          },
+          hAxis: {
+              title: "День"
+          }
+      }
+    };
+
+    $scope.refreshWeekChart = function(week) {
+      $http.get('chart/weekly?personName=' + $scope.foodperson + '&weekNumber=' + week).then(function(res) {
+        var weekData = res.data;
+        var rows = [];
+        var data = {
+          cols: [
+            {id: "dayOfWeek", label: "День", type: "date"},
+            {id: "calories", label: "Калории", type: "number"}
+          ],
+          rows: rows
+        };
+        angular.forEach(weekData, function(dd) {
+          var row = {
+            c: [
+              {v: new Date(dd.date)},
+              {v: dd.calories}
+            ]
+          }
+          rows.push(row);
+        })
+        $scope.weeklyCaloriesChart.data = data;
+
+        rows = [];
+        data = {
+          cols: [
+            {id: "dayOfWeek", label: "День", type: "string"},
+            {id: "protein", label: "Белки", type: "number"},
+            {id: "fat", label: "Жиры", type: "number"},
+            {id: "carbs", label: "Углеводы", type: "number"},
+            {id: "total", label: "Остальное", type: "number"},
+          ],
+          rows: rows
+        };
+        angular.forEach(weekData, function(dd) {
+          var row = {
+            c: [
+              {v: dd.dateLabel},
+              {v: dd.weight.protein},
+              {v: dd.weight.fat},
+              {v: dd.weight.carbs},
+              {v: dd.weight.total-dd.weight.protein-dd.weight.fat-dd.weight.carbs},
+            ]
+          }
+          rows.push(row);
+        })
+        $scope.weeklyWeightChart.data = data;
+      });
+    }
+
+    $scope.currentWeek = moment().week() - 2;
+    $scope.refreshWeekChart($scope.currentWeek);
+
+    $scope.refreshDayChart = function(selectedItem) {
+      var date = $scope.weeklyCaloriesChart.data.rows[selectedItem.row].c[0].v;
+      $scope.refreshChart(date);
+      // console.log($scope.weeklyCaloriesChart.view);
+    }
+
+    $scope.prevWeekChart = function() {
+      $scope.currentWeek  = $scope.currentWeek - 1;
+      $scope.refreshWeekChart($scope.currentWeek);
+    }
+    $scope.nextWeekChart = function() {
+      $scope.currentWeek  = $scope.currentWeek + 1;
+      $scope.refreshWeekChart($scope.currentWeek);
     }
 
 });

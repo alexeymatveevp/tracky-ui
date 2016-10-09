@@ -21,7 +21,7 @@
             <md-radio-button value="kristino4ka">kristino4ka</md-radio-button>
           </md-radio-group>
         </div>
-        <div layout="column" layout-padding>
+        <div layout="column" class="foody-track">
           <md-autocomplete
               md-selected-item="selectedFood"
               md-search-text="searchFood"
@@ -38,8 +38,7 @@
               <a ng-click="newProduct(searchText)">Create a new one!</a>
             </md-not-found> -->
           </md-autocomplete>
-          вес
-          <input ng-model="foodweight">
+          <input ng-model="foodweight" placeholder="Сколько весит?" class="food-weight">
         </div>
         <div layout="row" layout-padding>
           <md-datepicker ng-model="fooddate" md-placeholder=""></md-datepicker>
@@ -47,10 +46,9 @@
         </div>
 
         <div>
-          <select ng-options="pn for pn in personNames" ng-model="foodperson" ng-change="refreshChart()"></select>
+          <!-- <select ng-options="pn for pn in personNames" ng-model="foodperson" ng-change="refreshChart()"></select> -->
           <select ng-options="d.desc for d in chartDatePeriods track by d.id" ng-model="pieDate" ng-change="refreshChart()"></select>
-          {{pieChartForDate}}
-          <md-grid-list md-cols="3" md-cols-xs="1" md-cols-sm="1" md-cols-md="2"
+          <md-grid-list md-cols="2" md-cols-xs="1" md-cols-sm="1" md-cols-md="2"
                         md-gutter="12px"
                         md-row-height="600px"
                         >
@@ -61,19 +59,33 @@
               <nvd3 options="pieOptions" data="pieData"></nvd3>
               <md-grid-tile-header><h3>Калорий за период</h3></md-grid-tile-header>
             </md-grid-tile>
-            <md-grid-tile md-rowspan="1"
+            <!-- <md-grid-tile md-rowspan="1"
                           md-colspan="1"
                           md-colspan-sm="1"
                           md-colspan-xs="1">
               <nvd3 options="barChartOptions" data="barData"></nvd3>
               <md-grid-tile-header><h3>Калорий за день</h3></md-grid-tile-header>
-            </md-grid-tile>
+            </md-grid-tile> -->
             <md-grid-tile md-rowspan="1"
                           md-colspan="1"
                           md-colspan-sm="1"
                           md-colspan-xs="1">
-              <h3>Another graph</h3>
-              <md-grid-tile-header><h3>Калорий за день</h3></md-grid-tile-header>
+              <div google-chart chart="weeklyCaloriesChart" agc-on-select="refreshDayChart(selectedItem)" style="width:100%; height: 100%;" ng-class="{'in-back': !$root.showWeeklyCalories}"></div>
+              <div google-chart chart="weeklyWeightChart" style="width:100%; height: 100%;" ng-class="{'in-back': !$root.showWeeklyWeight}"></div>
+              <md-grid-tile-header layout="row">
+                <md-button class="md-icon-button md-raised" ng-click="prevWeekChart()">
+                    <md-icon md-svg-src="icons/left.svg"></md-icon>
+                </md-button>
+                <span flex></span>
+                <div class="mid">
+                  <md-button class="md-primary md-raised" ng-click="$root.showWeeklyCalories = true; $root.showWeeklyWeight = false;">калории</md-button>
+                  <md-button class="md-warn md-raised" ng-click="$root.showWeeklyCalories = false; $root.showWeeklyWeight = true;">вес</md-button>
+                </div>
+                <span flex></span>
+                <md-button class="md-icon-button md-raised" ng-click="nextWeekChart()">
+                    <md-icon md-svg-src="icons/right.svg"></md-icon>
+                </md-button>
+              </md-grid-tile-header>
             </md-grid-tile>
           </md-grid-list>
         </div>

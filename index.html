@@ -14,6 +14,7 @@
   <script src="lib/angular-cookies.min.js"></script>
   <script src="lib/angular-material.min.js"></script>
   <script src="lib/moment.min.js"></script>
+  <script src="lib/ng-google-chart.js"></script>
   <script src="food.js"></script>
   <link rel="stylesheet" href="bootstrap.css"/>
   <link rel="stylesheet" href="lib/nv.d3.min.css"/>
@@ -21,10 +22,6 @@
   <style>
   nvd3 > svg {
     display: inline-block!important;
-  }
-  md-autocomplete > md-autocomplete-wrap {
-    background: white;
-    border: 1px black solid;
   }
   [role="tabpanel"] {
       transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s;
@@ -35,6 +32,36 @@
   }
   [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
     display: none !important;
+  }
+  .foody-track > md-autocomplete {
+    margin-bottom: 15px;
+    height: 60px;
+  }
+  .foody-track > md-autocomplete > md-autocomplete-wrap {
+    box-shadow: none;
+    height: 60px;
+  }
+  .foody-track > md-autocomplete > md-autocomplete-wrap > input[type=search] {
+    border: 0;
+    outline: 3px auto #ddd;
+    font-size: 18px;
+    height: 60px;
+  }
+  input.food-weight {
+    border: 0;
+    outline: 3px auto #ddd;
+    height: 40px;
+    font-size: 18px;
+    padding: 15px;
+    height: 60px;
+  }
+  div.in-back {
+    position: absolute;
+    left: -10000px;
+  }
+  md-grid-tile-header > figcaption {
+    display: flex;
+    width: 100%;
   }
   </style>
 </head>
